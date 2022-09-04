@@ -4,6 +4,7 @@ from tkinter import ttk
 
 import numpy
 import numpy as np
+import PIL
 from PIL import ImageGrab
 from PIL import Image, ImageFilter
 import cv2
@@ -30,17 +31,26 @@ class main:
         x1 = x + self.c.winfo_width()
         y1 = y + self.c.winfo_height()
         img = ImageGrab.grab().crop((x, y, x1, y1))
-        #img.thumbnail((28, 28))
-        img = img.resize((28, 28))
-        img = img.filter(ImageFilter.GaussianBlur(0.6))
-        img = img.convert('L')
 
+        img = img.resize((28, 28))
+        img = img.convert('L')
+        img = img.filter(ImageFilter.GaussianBlur(0.8))
+        img = PIL.ImageOps.invert(img)
+        #img = img.point(lambda p: 0 if p < 255/2 else p)
+
+        #img = cv2.imread("C:\\Users\\kubaa\\Downloads\\1.jpg", 1)
+        #img = numpy.array(img)
+        #image = cv2.GaussianBlur(image, (5, 5), 0.5)
+        #img = cv2.resize(img, (28, 28), interpolation=cv2.INTER_AREA)
+        #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        #retval, image = cv2.threshold(image, int(255/2), 255, cv2.THRESH_BINARY_INV)
+        #img = Image.fromarray(img)
         return img
 
     def previewInputImg(self):
         img = self.GetImg()
         img.show()
-        img.save("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\digit.png")
+        img.save("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\digit.jpg")
 
     def paint(self, e):
         if self.old_x and self.old_y:
@@ -59,10 +69,10 @@ class main:
         for i in range(10):
             if data[i] > 0.1:
                 self.advancedPredictionWigets[str(i)].config(
-                    text=str((i + 1) % 10) + "({:0.1f}%)".format(data[i] * 100))
+                    text=str(i) + "({:0.1f}%)".format(data[i] * 100))
             else:
                 self.advancedPredictionWigets[str(i)].config(
-                    text=str((i + 1) % 10) + "({:0.1f}0%)".format(data[i] * 100))
+                    text=str(i) + "({:0.1f}0%)".format(data[i] * 100))
 
     # resting or cleaning the canvas
     def reset(self, e):
@@ -96,7 +106,7 @@ class main:
         # Slider Label
         Label(sliderFrame, text='Pen Width:', font='arial 18').grid(row=0, column=0)
         # Slider
-        self.slider = ttk.Scale(sliderFrame, from_=1, to=120, command=self.changeW, orient=HORIZONTAL)
+        self.slider = ttk.Scale(sliderFrame, from_=30, to=60, command=self.changeW, orient=HORIZONTAL)
         self.slider.set(self.pen_width)
         self.slider.grid(row=0, column=1, ipadx=168)
 

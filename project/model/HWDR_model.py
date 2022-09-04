@@ -1,10 +1,11 @@
 from torch import Tensor
 import torch.nn as nn
 
-class MNISTConvNetModel(nn.Module):
+
+class MNISTConvNetModelV1(nn.Module):
 
     def __init__(self):
-        super(MNISTConvNetModel, self).__init__()
+        super(MNISTConvNetModelV1, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=14, kernel_size=5, padding=2, stride=1)
         self.activ1 = nn.ReLU()
@@ -21,7 +22,6 @@ class MNISTConvNetModel(nn.Module):
         self.dense2 = nn.Linear(in_features=32, out_features=10)
 
     def forward(self, x: Tensor) -> Tensor:
-
         x = self.conv1(x)
         x = self.activ1(x)
         x = self.drop1(x)
@@ -38,6 +38,7 @@ class MNISTConvNetModel(nn.Module):
         x = self.dense2(x)
 
         return x
+
 
 class MNISTConvNetModelV2(nn.Module):
 
@@ -67,7 +68,6 @@ class MNISTConvNetModelV2(nn.Module):
         self.dense3 = nn.Linear(in_features=32, out_features=10)
 
     def forward(self, x: Tensor) -> Tensor:
-
         x = self.conv1(x)
         x = self.activ1(x)
         x = self.drop1(x)

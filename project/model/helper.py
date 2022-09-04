@@ -1,4 +1,4 @@
-from HWDR_model import MNISTConvNetModel, MNISTConvNetModelV2
+from HWDR_model import MNISTConvNetModelV1, MNISTConvNetModelV2
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -11,14 +11,16 @@ img_transforms = transforms.Compose([
 ])
 
 # Data classes
-data_classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+data_classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 torch.set_printoptions(threshold=1)
+
 
 class Classifier:
 
     def __init__(self):
-        self.model = MNISTConvNetModelV2()
-        self.model.load_state_dict(torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model.pt"))
+        self.model = MNISTConvNetModelV1()
+        self.model.load_state_dict(
+            torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelV1.pt"))
         self.model.eval()
 
     def classify(self, img):
