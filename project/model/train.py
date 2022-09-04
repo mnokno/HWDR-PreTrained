@@ -11,7 +11,7 @@ import torchvision
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from HWDR_model import MNISTConvNetModelV1, MNISTConvNetModelV2
+from HWDR_model import MyConNet1, MyConNet2, MyConNet3, LeNet5Variant
 from trainer import MyTrainer
 
 # Defines transformations for dataset normalization
@@ -52,14 +52,15 @@ def test_accuracy(model):
         accuracies.append(accuracy_batch)
     return torch.Tensor(accuracies).mean().item()
 
-model = MNISTConvNetModelV1()
+model = MyConNet3()
+#model.load_state_dict(torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelMyConNet2.pt"))
 loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 print(test_accuracy(model))
 
 trn = MyTrainer(model, optimizer, loss_fn)
-trn.fit(train_loader, test_loader, epochs=20, eval_every=2)
+trn.fit(train_loader, test_loader, epochs=100, eval_every=5)
 torch.save(model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model.pt")
 
 print(test_accuracy(model))

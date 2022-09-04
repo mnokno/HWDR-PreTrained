@@ -1,4 +1,4 @@
-from HWDR_model import MNISTConvNetModelV1, MNISTConvNetModelV2
+from HWDR_model import MyConNet1, MyConNet2
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -18,9 +18,9 @@ torch.set_printoptions(threshold=1)
 class Classifier:
 
     def __init__(self):
-        self.model = MNISTConvNetModelV1()
+        self.model = MyConNet2()
         self.model.load_state_dict(
-            torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelV1.pt"))
+            torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelMyConNet2.pt"))
         self.model.eval()
 
     def classify(self, img):

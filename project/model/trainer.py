@@ -36,8 +36,8 @@ class MyTrainer:
                 # Adjust learning weights
                 self.optimizer.step()
 
-            if e % eval_every == 0:
-                torch.save(self.model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model_checkpoint_" + str(e + 1) + ".pt")
+            if (e + 1) % eval_every == 0:
+                torch.save(self.model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model_checkpoint_e" + str(e + 1) + ".pt")
                 with torch.no_grad():
                     self.model.eval()
                     losses = []
@@ -53,10 +53,10 @@ class MyTrainer:
                     if early_stopping:
                         if avg_loss < best_loss:
                             best_loss = avg_loss
-                            print("The loss after", e + 1, "epochs was", avg_loss)
+                            print("The loss after", (e + 1), "epochs was", avg_loss)
                         else:
-                            print("The loss after", e + 1, "epochs was", avg_loss)
+                            print("The loss after", (e + 1), "epochs was", avg_loss)
                             print("The loss had increased since the last checkpoint, stopping training!")
                             break
                     else:
-                        print("The loss after", e + 1, "epochs was", avg_loss)
+                        print("The loss after", (e + 1), "epochs was", avg_loss)

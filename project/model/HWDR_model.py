@@ -1,11 +1,11 @@
 from torch import Tensor
 import torch.nn as nn
+import torch.nn.functional as F
 
-
-class MNISTConvNetModelV1(nn.Module):
+class MyConNet1(nn.Module):
 
     def __init__(self):
-        super(MNISTConvNetModelV1, self).__init__()
+        super(MyConNet1, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=14, kernel_size=5, padding=2, stride=1)
         self.activ1 = nn.ReLU()
@@ -40,10 +40,10 @@ class MNISTConvNetModelV1(nn.Module):
         return x
 
 
-class MNISTConvNetModelV2(nn.Module):
+class MyConNet2(nn.Module):
 
     def __init__(self):
-        super(MNISTConvNetModelV2, self).__init__()
+        super(MyConNet2, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=14, kernel_size=5, padding=2, stride=1)
         self.activ1 = nn.ReLU()
@@ -58,11 +58,11 @@ class MNISTConvNetModelV2(nn.Module):
         self.drop3 = nn.Dropout(p=0.3)
 
         self.dense1 = nn.Linear(in_features=56 * 14 * 14, out_features=406)
-        self.activ4 = nn.Tanh()
+        self.activ4 = nn.ReLU()
         self.drop4 = nn.Dropout(p=0.3)
 
         self.dense2 = nn.Linear(in_features=406, out_features=32)
-        self.activ5 = nn.Tanh()
+        self.activ5 = nn.ReLU()
         self.drop5 = nn.Dropout(p=0.3)
 
         self.dense3 = nn.Linear(in_features=32, out_features=10)
@@ -91,4 +91,70 @@ class MNISTConvNetModelV2(nn.Module):
 
         x = self.dense3(x)
 
+        return x
+
+
+class MyConNet3(nn.Module):
+
+    def __init__(self):
+        super(MyConNet3, self).__init__()
+
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=14, kernel_size=5, stride=1)
+        self.activ1 = nn.ReLU()
+        self.drop1 = nn.Dropout(p=0.3)
+
+        self.conv2 = nn.Conv2d(in_channels=14, out_channels=28, kernel_size=5, stride=1)
+        self.activ2 = nn.ReLU()
+        self.drop2 = nn.Dropout(p=0.3)
+
+        self.dense1 = nn.Linear(in_features=28 * 20 * 20, out_features=560)
+        self.activ4 = nn.ReLU()
+        self.drop4 = nn.Dropout(p=0.3)
+
+        self.dense2 = nn.Linear(in_features=560, out_features=56)
+        self.activ5 = nn.ReLU()
+        self.drop5 = nn.Dropout(p=0.3)
+
+        self.dense3 = nn.Linear(in_features=56, out_features=10)
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv1(x)
+        x = self.activ1(x)
+        x = self.drop1(x)
+
+        x = self.conv2(x)
+        x = self.activ2(x)
+        x = x.view(-1, 28 * 20 * 20)
+        x = self.drop2(x)
+
+        x = self.dense1(x)
+        x = self.activ4(x)
+        x = self.drop4(x)
+
+        x = self.dense2(x)
+        x = self.activ5(x)
+        x = self.drop5(x)
+
+        x = self.dense3(x)
+
+        return x
+
+
+class LeNet5Variant(nn.Module):
+    def __init__(self):
+        super(LeNet5Variant, self).__init__()
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 4 * 4, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 16 * 4 * 4)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
         return x
