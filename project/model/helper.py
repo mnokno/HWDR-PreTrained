@@ -1,4 +1,4 @@
-from HWDR_model import MNISTConvNetModel
+from HWDR_model import MNISTConvNetModel, MNISTConvNetModelV2
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -17,13 +17,14 @@ torch.set_printoptions(threshold=1)
 class Classifier:
 
     def __init__(self):
-        self.model = MNISTConvNetModel()
+        self.model = MNISTConvNetModelV2()
         self.model.load_state_dict(torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model.pt"))
         self.model.eval()
 
     def classify(self, img):
         img = img_transforms(img).float()
-        output = self.model(img)
-        output:Tensor = nn.Softmax(dim=1)(output)
+        self.model.eval()
+        output = self.model(img.reshape(1, 1, 28, 28))
+        output = nn.Softmax(dim=1)(output)
         _, predicted = torch.max(output.data, 1)
         return data_classes[predicted.item()], output.detach().numpy()[0]

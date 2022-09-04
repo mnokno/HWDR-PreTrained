@@ -1,8 +1,12 @@
 import random
 from tkinter import *
 from tkinter import ttk
+
+import numpy
+import numpy as np
 from PIL import ImageGrab
-from PIL import Image
+from PIL import Image, ImageFilter
+import cv2
 
 from helper import Classifier
 
@@ -26,23 +30,31 @@ class main:
         x1 = x + self.c.winfo_width()
         y1 = y + self.c.winfo_height()
         img = ImageGrab.grab().crop((x, y, x1, y1))
-        img = img.convert('1')
-        img = img.resize((28, 28), reducing_gap=4)
-        #img.save("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\digit.png")
+        #img.thumbnail((28, 28))
+        img = img.resize((28, 28))
+        img = img.filter(ImageFilter.GaussianBlur(0.6))
+        img = img.convert('L')
+
         return img
 
     def previewInputImg(self):
-        self.GetImg().show()
+        img = self.GetImg()
+        img.show()
+        img.save("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\digit.png")
 
     def paint(self, e):
         if self.old_x and self.old_y:
-            self.c.create_line(self.old_x, self.old_y, e.x, e.y, width=self.pen_width, fill="black", capstyle=ROUND, smooth=True)
+
+            self.c.create_line(self.old_x, self.old_y, e.x, e.y, width=self.pen_width, fill="black", capstyle=ROUND, smooth=True, splinesteps=12)
 
         self.old_x = e.x
         self.old_y = e.y
         img_class, data = self.classifier.classify(self.GetImg())
-        print(img_class)
         self.prodictionLabel.config(text=img_class)
+        if numpy.max(data) > 0.1:
+            self.confidanceLabel.config(text="{:0.1f}%".format(numpy.max(data) * 100))
+        else:
+            self.confidanceLabel.config(text="{:0.1f}0%".format(numpy.max(data) * 100))
         self.advancedPredictionWigets["production"].config(text=img_class)
         for i in range(10):
             if data[i] > 0.1:
@@ -84,7 +96,7 @@ class main:
         # Slider Label
         Label(sliderFrame, text='Pen Width:', font='arial 18').grid(row=0, column=0)
         # Slider
-        self.slider = ttk.Scale(sliderFrame, from_=30, to=60, command=self.changeW, orient=HORIZONTAL)
+        self.slider = ttk.Scale(sliderFrame, from_=1, to=120, command=self.changeW, orient=HORIZONTAL)
         self.slider.set(self.pen_width)
         self.slider.grid(row=0, column=1, ipadx=168)
 
@@ -99,7 +111,7 @@ class main:
         self.prodictionLabel = Label(self.simplePredictionFrame, text="0", font='arial 300')
         self.prodictionLabel.grid(row=0, column=0, sticky="nw")
         self.confidanceLabel = Label(self.simplePredictionFrame, text="0%", font='arial 50')
-        self.confidanceLabel.grid(row=1, column=0)
+        self.confidanceLabel.grid(row=1, column=0, sticky="n")
 
         # Frame for advanced prediction
         self.advancedPredictionFrame = Frame(self.master)

@@ -15,7 +15,10 @@ class MyTrainer:
             train_dataloader: DataLoader,
             test_dataloader: DataLoader,
             epochs: int = 100,
-            eval_every: int = 10):
+            eval_every: int = 10,
+            early_stopping: bool = True):
+
+        best_loss = 1e9
 
         for e in range(epochs):
             # Make sure gradient tracking is on, and do a pass over the data
@@ -34,6 +37,7 @@ class MyTrainer:
                 self.optimizer.step()
 
             if e % eval_every == 0:
+                torch.save(self.model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model_checkpoint_" + str(e + 1) + ".pt")
                 with torch.no_grad():
                     self.model.eval()
                     losses = []
@@ -45,4 +49,14 @@ class MyTrainer:
                         losses.append(loss.item())
 
                     avg_loss = round(torch.Tensor(losses).mean().item(), 4)
-                    print("The loss after", e, "epochs was", avg_loss)
+
+                    if early_stopping:
+                        if avg_loss < best_loss:
+                            best_loss = avg_loss
+                            print("The loss after", e + 1, "epochs was", avg_loss)
+                        else:
+                            print("The loss after", e + 1, "epochs was", avg_loss)
+                            print("The loss had increased since the last checkpoint, stopping training!")
+                            break
+                    else:
+                        print("The loss after", e + 1, "epochs was", avg_loss)
