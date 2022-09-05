@@ -99,23 +99,23 @@ class MyConNet3(nn.Module):
     def __init__(self):
         super(MyConNet3, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=14, kernel_size=5, stride=1)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=8, kernel_size=5, stride=1)
         self.activ1 = nn.ReLU()
         self.drop1 = nn.Dropout(p=0.3)
 
-        self.conv2 = nn.Conv2d(in_channels=14, out_channels=28, kernel_size=5, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=5, stride=1)
         self.activ2 = nn.ReLU()
         self.drop2 = nn.Dropout(p=0.3)
 
-        self.dense1 = nn.Linear(in_features=28 * 20 * 20, out_features=560)
-        self.activ4 = nn.ReLU()
+        self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1)
+        self.activ3 = nn.ReLU()
+        self.drop3 = nn.Dropout(p=0.3)
+
+        self.dense1 = nn.Linear(in_features=32 * 16 * 16, out_features=560)
+        self.activ4 = nn.Tanh()
         self.drop4 = nn.Dropout(p=0.3)
 
-        self.dense2 = nn.Linear(in_features=560, out_features=56)
-        self.activ5 = nn.ReLU()
-        self.drop5 = nn.Dropout(p=0.3)
-
-        self.dense3 = nn.Linear(in_features=56, out_features=10)
+        self.dense3 = nn.Linear(in_features=560, out_features=10)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.conv1(x)
@@ -124,16 +124,16 @@ class MyConNet3(nn.Module):
 
         x = self.conv2(x)
         x = self.activ2(x)
-        x = x.view(-1, 28 * 20 * 20)
         x = self.drop2(x)
+
+        x = self.conv3(x)
+        x = self.activ3(x)
+        x = x.view(-1, 32 * 16 * 16)
+        x = self.drop3(x)
 
         x = self.dense1(x)
         x = self.activ4(x)
         x = self.drop4(x)
-
-        x = self.dense2(x)
-        x = self.activ5(x)
-        x = self.drop5(x)
 
         x = self.dense3(x)
 

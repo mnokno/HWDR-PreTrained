@@ -53,14 +53,14 @@ def test_accuracy(model):
     return torch.Tensor(accuracies).mean().item()
 
 model = MyConNet3()
-#model.load_state_dict(torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelMyConNet2.pt"))
-loss_fn = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+model.load_state_dict(torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelMyConNet3.pt"))
+#loss_fn = torch.nn.CrossEntropyLoss()
+#optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 print(test_accuracy(model))
 
-trn = MyTrainer(model, optimizer, loss_fn)
-trn.fit(train_loader, test_loader, epochs=100, eval_every=5)
-torch.save(model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model.pt")
+#trn = MyTrainer(model, optimizer, loss_fn)
+#trn.fit(train_loader, test_loader, epochs=100, eval_every=5)
+#torch.save(model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model.pt")
 
-print(test_accuracy(model))
+#print(test_accuracy(model))
