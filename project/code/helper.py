@@ -20,7 +20,7 @@ class Classifier:
     def __init__(self):
         self.model = MyConNet2()
         self.model.load_state_dict(
-            torch.load("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\modelMyConNet2.pt"))
+            torch.load("../saved_models/modelMyConNet2.pt"))
         self.model.eval()
 
     def classify(self, img):

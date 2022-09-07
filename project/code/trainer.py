@@ -37,7 +37,7 @@ class MyTrainer:
                 self.optimizer.step()
 
             if (e + 1) % eval_every == 0:
-                torch.save(self.model.state_dict(), "C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\model_checkpoint_e" + str(e + 1) + ".pt")
+                torch.save(self.model.state_dict(), "../check_points/model_checkpoint_e" + str(e + 1) + ".pt")
                 with torch.no_grad():
                     self.model.eval()
                     losses = []

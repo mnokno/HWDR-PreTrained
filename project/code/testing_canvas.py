@@ -50,7 +50,7 @@ class main:
     def previewInputImg(self):
         img = self.GetImg()
         img.show()
-        img.save("C:\\Users\\kubaa\\Documents\\GitHub\\Python\\HWDR-PreTrained\\digit.jpg")
+        img.save("../img_preview/digit.jpg")
 
     def paint(self, e):
         if self.old_x and self.old_y:
