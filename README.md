@@ -1,2 +1,3 @@
 # HWDR-PreTrained
-Hand written digit recognition with customer paint window for testing. Pretrained on MINTs data set.
+Handwritten digit recognition with custom paint window for testing. Pretrained on MINTs dataset.
+d
