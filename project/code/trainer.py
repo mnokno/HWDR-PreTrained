@@ -8,9 +8,11 @@ class MyTrainer:
         self.optimizer = optimizer
         self.loss_fn = loss_fn
 
+    # Ensures that the given optimizer points to the given model
     def _check_optim_net_aligned(self):
         assert self.optimizer.param_groups[0]['params'] == list(self.model.parameters())
 
+    # Trains the model
     def fit(self,
             train_dataloader: DataLoader,
             test_dataloader: DataLoader,
@@ -36,6 +38,7 @@ class MyTrainer:
                 # Adjust learning weights
                 self.optimizer.step()
 
+            # Reports on the training progress
             if (e + 1) % eval_every == 0:
                 torch.save(self.model.state_dict(), "../check_points/model_checkpoint_e" + str(e + 1) + ".pt")
                 with torch.no_grad():

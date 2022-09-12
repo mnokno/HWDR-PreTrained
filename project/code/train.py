@@ -1,13 +1,5 @@
-from typing import Tuple, List
 import torch
-import torch.optim as optim
-from torch.optim import lr_scheduler
-import numpy as np
-from torch import Tensor
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn.modules.loss import _Loss
-import torchvision
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
@@ -41,26 +33,39 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           batch_size=60,
                                           shuffle=False)
 
-def test_accuracy(model):
+
+# Calculates the accuracy on the test set
+def test_accuracy(model: nn.Module) -> float:
+    # Ensures the model is in eval mode
     model.eval()
+    # We use a list to store accuracies as they are computed for each batch in the test_loader
     accuracies = []
+
     for data in test_loader:
         # Every data instance is an input + label pair
         X_batch, y_batch = data
         output = model(X_batch)
         accuracy_batch = (torch.max(output, dim=1)[1] == y_batch).type(torch.float32).mean().item()
         accuracies.append(accuracy_batch)
+
+    # Calculates the average accuracy from all batches and returns it as a float
     return torch.Tensor(accuracies).mean().item()
 
-model = MyConNet3()
-model.load_state_dict(torch.load("../saved_models/newModel.pt"))
-#loss_fn = torch.nn.CrossEntropyLoss()
-#optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-print(test_accuracy(model))
+# Defines what model to train or test
+model_dir = "../saved_models/newModel.pt"
+train = True
+model_ = LeNet5Variant()
 
-#trn = MyTrainer(model, optimizer, loss_fn)
-#trn.fit(train_loader, test_loader, epochs=100, eval_every=5)
-#torch.save(model.state_dict(), "../saved_models/newModel.pt")
+if train:  # Trains the model
+    print("Initial accuracy:" + str(test_accuracy(model_)))
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model_.parameters(), lr=0.001, momentum=0.9)
+    trn = MyTrainer(model_, optimizer, loss_fn)
+    trn.fit(train_loader, test_loader, epochs=100, eval_every=1)
+    torch.save(model_.state_dict(), model_dir)
+    print("Finale accuracy: " + str(test_accuracy(model_)))
 
-#print(test_accuracy(model))
+else:  # Tests the model
+    model_.load_state_dict(torch.load(model_dir))
+    print(test_accuracy(model_))

@@ -39,12 +39,12 @@ classes = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 def matplotlib_imshow(img, one_channel=False):
     if one_channel:
         img = img.mean(dim=0)
-    img = img / 2 + 0.5  # unnormalize
-    npimg = img.numpy()
+    img = img / 2 + 0.5  # un-normalize
+    np_img = img.numpy()
     if one_channel:
-        plt.imshow(npimg, cmap="Greys")
+        plt.imshow(np_img, cmap="Greys")
     else:
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.imshow(np.transpose(np_img, (1, 2, 0)))
 
 
 dataiter = iter(train_loader)

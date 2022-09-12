@@ -1,104 +1,105 @@
-import random
 from tkinter import *
 from tkinter import ttk
 
 import numpy
-import numpy as np
-import PIL
 from PIL import ImageGrab
-from PIL import Image, ImageFilter
-import cv2
-
+from PIL import Image
 from helper import Classifier
 
-class main:
+
+class Main:
     def __init__(self, master):
         self.classifier = Classifier()
         self.master = master
+
         self.color_fg = 'black'
         self.color_bg = 'white'
         self.old_x = None
         self.old_y = None
         self.pen_width = 5
-        self.drawWidgets()
-        self.c.bind('<B1-Motion>',self.paint)#drwaing the line
-        self.c.bind('<ButtonRelease-1>',self.reset)
+
+        self.slider = None
+        self.c = None
+        self.simple_prediction_frame = None
+        self.production_label = None
+        self.confidence_label = None
+        self.advancedPredictionFrame = None
+        self.advanced_prediction_widgets = None
+        self.draw_widgets()
+
+        # c will be assigned in self.draw_widgets() hence it will be a Canvas not None
+        # noinspection PyUnresolvedReferences
+        self.c.bind('<B1-Motion>', self.paint)  # drawing on the canvas
+        # c will be assigned in self.draw_widgets() hence it will be a Canvas not None
+        # noinspection PyUnresolvedReferences
+        self.c.bind('<ButtonRelease-1>', self.reset)
         self.detailed_prediction_report = False
 
-    def GetImg(self):
+    # Extracts the image from the canvas ready to be fed into classifier
+    def get_img(self) -> Image:
         x = root.winfo_rootx() + self.c.winfo_x()
         y = root.winfo_rooty() + self.c.winfo_y()
         x1 = x + self.c.winfo_width()
         y1 = y + self.c.winfo_height()
         img = ImageGrab.grab().crop((x, y, x1, y1))
+        return Classifier.format_image(img, invert_colors=True)
 
-        img = img.resize((28, 28))
-        img = img.convert('L')
-        img = img.filter(ImageFilter.GaussianBlur(0.8))
-        img = PIL.ImageOps.invert(img)
-        #img = img.point(lambda p: 0 if p < 255/2 else p)
-
-        #img = cv2.imread("C:\\Users\\kubaa\\Downloads\\1.jpg", 1)
-        #img = numpy.array(img)
-        #image = cv2.GaussianBlur(image, (5, 5), 0.5)
-        #img = cv2.resize(img, (28, 28), interpolation=cv2.INTER_AREA)
-        #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        #retval, image = cv2.threshold(image, int(255/2), 255, cv2.THRESH_BINARY_INV)
-        #img = Image.fromarray(img)
-        return img
-
-    def previewInputImg(self):
-        img = self.GetImg()
+    # Saves extracted image to file and open preview
+    # NOTE: the preview opened on window will automatically blur the image when zoomed in
+    def preview_input_img(self) -> None:
+        img = self.get_img()
         img.show()
         img.save("../img_preview/digit.jpg")
 
-    def paint(self, e):
+    # Handles painting on the canvas
+    def paint(self, e) -> None:
         if self.old_x and self.old_y:
 
             self.c.create_line(self.old_x, self.old_y, e.x, e.y, width=self.pen_width, fill="black", capstyle=ROUND, smooth=True, splinesteps=12)
 
         self.old_x = e.x
         self.old_y = e.y
-        img_class, data = self.classifier.classify(self.GetImg())
-        self.prodictionLabel.config(text=img_class)
+        img_class, data = self.classifier.classify(self.get_img())
+        self.production_label.config(text=img_class)
         if numpy.max(data) > 0.1:
-            self.confidanceLabel.config(text="{:0.1f}%".format(numpy.max(data) * 100))
+            self.confidence_label.config(text="{:0.1f}%".format(numpy.max(data) * 100))
         else:
-            self.confidanceLabel.config(text="{:0.1f}0%".format(numpy.max(data) * 100))
-        self.advancedPredictionWigets["production"].config(text=img_class)
+            self.confidence_label.config(text="{:0.1f}0%".format(numpy.max(data) * 100))
+        self.advanced_prediction_widgets["production"].config(text=img_class)
         for i in range(10):
             if data[i] > 0.1:
-                self.advancedPredictionWigets[str(i)].config(
+                self.advanced_prediction_widgets[str(i)].config(
                     text=str(i) + "({:0.1f}%)".format(data[i] * 100))
             else:
-                self.advancedPredictionWigets[str(i)].config(
+                self.advanced_prediction_widgets[str(i)].config(
                     text=str(i) + "({:0.1f}0%)".format(data[i] * 100))
 
-    # resting or cleaning the canvas
-    def reset(self, e):
+    # Resting or cleaning the canvas
+    def reset(self, e) -> None:
         self.old_x = None
         self.old_y = None
 
-    # change Width of pen through slider
-    def changeW(self, e):
+    # Change Width of pen through slider
+    def changeW(self, e) -> None:
         self.pen_width = e
 
-    # clears the canvas
-    def clear(self):
+    # Clears the canvas
+    def clear(self) -> None:
         self.c.delete(ALL)
 
-    # changes view between detailed and simple
-    def change_view(self):
+    # Changes view between detailed and simple
+    def change_view(self) -> None:
         self.detailed_prediction_report = not self.detailed_prediction_report
 
         if self.detailed_prediction_report:
-            self.simplePredictionFrame.grid_remove()
+            self.simple_prediction_frame.grid_remove()
             self.advancedPredictionFrame.grid(row=0, column=1)
         else:
-            self.simplePredictionFrame.grid(row=0, column=1)
+            self.simple_prediction_frame.grid(row=0, column=1)
             self.advancedPredictionFrame.grid_remove()
 
-    def drawWidgets(self):
+    # Displays all widgets
+    def draw_widgets(self) -> None:
 
         # Frame for Label and Slider
         sliderFrame = Frame(self.master)
@@ -115,39 +116,39 @@ class main:
         self.c.grid(row=0, column=0, padx=5)
 
         # Frame for simple prediction
-        self.simplePredictionFrame = Frame(self.master)
-        self.simplePredictionFrame.grid(row=0, column=1)
+        self.simple_prediction_frame = Frame(self.master)
+        self.simple_prediction_frame.grid(row=0, column=1)
         # Production
-        self.prodictionLabel = Label(self.simplePredictionFrame, text="0", font='arial 300')
-        self.prodictionLabel.grid(row=0, column=0, sticky="nw")
-        self.confidanceLabel = Label(self.simplePredictionFrame, text="0%", font='arial 50')
-        self.confidanceLabel.grid(row=1, column=0, sticky="n")
+        self.production_label = Label(self.simple_prediction_frame, text="0", font='arial 300')
+        self.production_label.grid(row=0, column=0, sticky="nw")
+        self.confidence_label = Label(self.simple_prediction_frame, text="0%", font='arial 50')
+        self.confidence_label.grid(row=1, column=0, sticky="n")
 
         # Frame for advanced prediction
         self.advancedPredictionFrame = Frame(self.master)
-        #self.advancedPredictionFrame.grid(row=0, column=1)
         t = Frame(self.advancedPredictionFrame)
         t.grid(row=0, column=0)
         # Production
-        self.advancedPredictionWigets = {}
+        self.advanced_prediction_widgets = {}
         for i in range(10):
-            self.advancedPredictionWigets[str(i)] = Label(t, text=str(i) + "(x%)", font='arial 30')
-            self.advancedPredictionWigets[str(i)].grid(row=i, column=0)
-        self.advancedPredictionWigets["production"] = Label(self.advancedPredictionFrame, text="0", font='arial 300')
-        self.advancedPredictionWigets["production"].grid(row=0, column=1, padx=(30, 0))
+            self.advanced_prediction_widgets[str(i)] = Label(t, text=str(i) + "(x%)", font='arial 30')
+            self.advanced_prediction_widgets[str(i)].grid(row=i, column=0)
+        self.advanced_prediction_widgets["production"] = Label(self.advancedPredictionFrame, text="0", font='arial 300')
+        self.advanced_prediction_widgets["production"].grid(row=0, column=1, padx=(30, 0))
 
         # Menu
         menu = Menu(self.master)
         self.master.config(menu=menu)
-        optionmenu = Menu(menu, tearoff=0)
-        menu.add_cascade(label='Options', menu=optionmenu)
-        optionmenu.add_command(label='Change View', command=self.change_view)
-        optionmenu.add_command(label='Clear Canvas', command=self.clear)
-        optionmenu.add_command(label='Exit', command=self.master.destroy)
-        optionmenu.add_command(label='Preview Input Img', command=self.previewInputImg)
+        option_menu = Menu(menu, tearoff=0)
+        menu.add_cascade(label='Options', menu=option_menu)
+        option_menu.add_command(label='Change View', command=self.change_view)
+        option_menu.add_command(label='Clear Canvas', command=self.clear)
+        option_menu.add_command(label='Exit', command=self.master.destroy)
+        option_menu.add_command(label='Preview Input Img', command=self.preview_input_img)
+
 
 if __name__ == '__main__':
     root = Tk()
-    main(root)
+    Main(root)
     root.title('HWDR Tester')
     root.mainloop()
