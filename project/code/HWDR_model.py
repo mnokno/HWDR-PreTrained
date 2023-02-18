@@ -100,23 +100,27 @@ class MyConNet3(nn.Module):
     def __init__(self):
         super(MyConNet3, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=8, kernel_size=5, stride=1)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1)
         self.activ1 = nn.ReLU()
         self.drop1 = nn.Dropout(p=0.3)
 
-        self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=5, stride=1)
+        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1)
         self.activ2 = nn.ReLU()
         self.drop2 = nn.Dropout(p=0.3)
 
-        self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1)
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1)
         self.activ3 = nn.ReLU()
         self.drop3 = nn.Dropout(p=0.3)
 
-        self.dense1 = nn.Linear(in_features=32 * 16 * 16, out_features=560)
+        self.dense1 = nn.Linear(in_features=64 * 16 * 16, out_features=64 * 16)
         self.activ4 = nn.Tanh()
         self.drop4 = nn.Dropout(p=0.3)
 
-        self.dense3 = nn.Linear(in_features=560, out_features=10)
+        self.dense2 = nn.Linear(in_features=64 * 16, out_features=64)
+        self.activ5 = nn.Tanh()
+        self.drop5 = nn.Dropout(p=0.3)
+
+        self.dense3 = nn.Linear(in_features=64, out_features=10)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.conv1(x)
@@ -129,15 +133,191 @@ class MyConNet3(nn.Module):
 
         x = self.conv3(x)
         x = self.activ3(x)
-        x = x.view(-1, 32 * 16 * 16)
+        x = x.view(-1, 64 * 16 * 16)
         x = self.drop3(x)
 
         x = self.dense1(x)
         x = self.activ4(x)
         x = self.drop4(x)
 
+        x = self.dense2(x)
+        x = self.activ5(x)
+        x = self.drop5(x)
+
         x = self.dense3(x)
 
+        return x
+
+
+class MyConNet4(nn.Module):
+
+    def __init__(self):
+        super(MyConNet4, self).__init__()
+
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=8, kernel_size=5, stride=1)
+        self.norm2d1 = nn.BatchNorm2d(8)
+        self.activ1 = nn.ReLU()
+        self.drop1 = nn.Dropout(p=0.3)
+
+        self.conv2 = nn.Conv2d(in_channels=8, out_channels=32, kernel_size=5, stride=1)
+        self.norm2d2 = nn.BatchNorm2d(32)
+        self.activ2 = nn.ReLU()
+        self.drop2 = nn.Dropout(p=0.3)
+
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5, stride=1)
+        self.norm2d3 = nn.BatchNorm2d(32)
+        self.activ3 = nn.ReLU()
+        self.drop3 = nn.Dropout(p=0.3)
+
+        self.dense1 = nn.Linear(in_features=32 * 16 * 16, out_features=560)
+        self.norm1d1 = nn.BatchNorm1d(560)
+        self.activ4 = nn.Tanh()
+        self.drop4 = nn.Dropout(p=0.3)
+
+        self.dense3 = nn.Linear(in_features=560, out_features=10)
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv1(x)
+        x = self.norm2d1(x)
+        x = self.activ1(x)
+
+        x = self.drop1(x)
+
+        x = self.conv2(x)
+        x = self.norm2d2(x)
+        x = self.activ2(x)
+
+        x = self.drop2(x)
+
+        x = self.conv3(x)
+        x = self.norm2d2(x)
+        x = self.activ3(x)
+
+        x = x.view(-1, 32 * 16 * 16)
+        x = self.drop3(x)
+
+        x = self.dense1(x)
+        x = self.norm1d1(x)
+        x = self.activ4(x)
+
+        x = self.drop4(x)
+
+        x = self.dense3(x)
+
+        return x
+
+
+class MyConNet5(nn.Module):
+
+    def __init__(self):
+        super(MyConNet5, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=5, stride=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(in_channels=128, out_channels=512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+        )
+
+        self.linear = nn.Sequential(
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512 * 9 * 9, out_features=512 * 9),
+            nn.BatchNorm1d(512 * 9),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512 * 9, out_features=512),
+            nn.BatchNorm1d(512),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512, out_features=64),
+            nn.BatchNorm1d(64),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=64, out_features=10),
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv(x)
+        x = x.view(x.size(0), -1)
+        x = self.linear(x)
+        return x
+
+
+class MyConNet6(nn.Module):
+
+    def __init__(self):
+        super(MyConNet6, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=5, stride=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU()
+        )
+
+        self.linear = nn.Sequential(
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=256 * 9 * 9, out_features=256 * 9),
+            nn.BatchNorm1d(256 * 9),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=256 * 9, out_features=256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=256, out_features=64),
+            nn.BatchNorm1d(64),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=64, out_features=10),
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv(x)
+        x = x.view(x.size(0), -1)
+        x = self.linear(x)
         return x
 
 
