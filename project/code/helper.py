@@ -2,7 +2,7 @@ import numpy
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
-from HWDR_model import MyConNet1, MyConNet2, MyConNet3, LeNet5Variant
+from HWDR_model import MyConNet1, MyConNet2, MyConNet3, LeNet5Variant, MyConNet6
 
 import PIL
 from PIL import Image, ImageFilter, ImageOps
@@ -24,8 +24,8 @@ torch.set_printoptions(threshold=1)
 class Classifier:
 
     def __init__(self):
-        self.model = MyConNet2()
-        self.model.load_state_dict(torch.load("../saved_models/modelMyConNet2.pt"))
+        self.model = MyConNet6()
+        self.model.load_state_dict(torch.load("../saved_models/MyConNet6.pt"))
         self.model.eval()
 
     # Classifies given image using preloaded CNN, returns image class and prediction matrix as a numpy array
