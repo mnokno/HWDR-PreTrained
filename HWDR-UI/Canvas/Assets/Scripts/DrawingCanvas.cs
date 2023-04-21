@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.IO;
 
 public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
@@ -126,5 +127,44 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
 
         texture.Apply();
+    }
+
+    public void SaveCanvas(string fileName)
+    {
+        File.WriteAllBytes(Application.dataPath + "/" + fileName + "b.png", texture.EncodeToPNG());
+
+        Color[] bytes = texture.GetPixels();
+
+        int size = 300;// (int)Mathf.Sqrt(bytes.Length);
+        float[,] data = new float[size, size];
+        float xC = 0;
+        float yC = 0;
+        float t = 0;
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                data[x, y] = -(bytes[x * size + y].grayscale - 1);
+                t += data[x, y];
+                xC += x * data[x, y];
+                yC += y * data[x, y];
+            }
+        }
+        xC = (xC / t) - (size / 2);
+        yC = (yC / t) - (size / 2);
+
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                data[x, y] = -(data[x, y] - 1);
+                bytes[x * size + y] = new Color(data[x, y], data[x, y], data[x, y]);
+            }
+        }
+
+        File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture.EncodeToPNG());
+
+        Debug.Log($"{xC} {yC} {t}");
+        
     }
 }
