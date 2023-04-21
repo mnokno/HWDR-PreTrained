@@ -13,7 +13,11 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     {
         rectTransform = GetComponent<RectTransform>();
         image = GetComponent<Image>();
+        ClearCanvas();
+    }
 
+    public void ClearCanvas()
+    {
         // Create a new texture to use as the canvas
         texture = new Texture2D((int)rectTransform.rect.width, (int)rectTransform.rect.height, TextureFormat.RGBA32, false);
         texture.filterMode = FilterMode.Point;
