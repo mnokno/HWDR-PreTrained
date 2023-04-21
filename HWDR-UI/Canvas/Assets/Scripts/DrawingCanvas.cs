@@ -7,6 +7,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     private RectTransform rectTransform;
     private Image image;
     private Texture2D texture;
+    public int brushSize = 15;
 
     private void Awake()
     {
@@ -75,7 +76,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
 
         while (true)
         {
-            texture.SetPixel(x0, y0, color);
+            DrawBrush(x0, y0, brushSize, color);
 
             if (x0 == x1 && y0 == y1)
             {
@@ -92,6 +93,31 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
             {
                 err += dx;
                 y0 += sy;
+            }
+        }
+
+        texture.Apply();
+    }
+
+    private void DrawBrush(int x, int y, int size, Color color)
+    {
+        int radius = size / 2;
+        int diameter = radius * 2;
+
+        for (int drawX = x - radius; drawX <= x + radius; drawX++)
+        {
+            for (int drawY = y - radius; drawY <= y + radius; drawY++)
+            {
+                int distanceX = Mathf.Abs(x - drawX);
+                int distanceY = Mathf.Abs(y - drawY);
+                float distance = Mathf.Sqrt(Mathf.Pow(distanceX, 2) + Mathf.Pow(distanceY, 2));
+                if (distance <= radius)
+                {
+                    if (drawX >= 0 && drawX < texture.width && drawY >= 0 && drawY < texture.height)
+                    {
+                        texture.SetPixel(drawX, drawY, color);
+                    }
+                }
             }
         }
 
