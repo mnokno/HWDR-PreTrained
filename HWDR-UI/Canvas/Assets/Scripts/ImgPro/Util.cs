@@ -53,12 +53,117 @@ namespace ImgPro
 
         public static float[,] Blure(float[,] img)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// Resizes the image so that digits max dimensions spans 73% of the image restitution
+        /// </summary>
+        /// <param name="img">Image data to size</param>
+        /// <returns>Sized copy of the original image data</returns>
         public static float[,] ResizeDigit(float[,] img)
         {
-            return null;
+            int size = (int)Math.Sqrt(img.Length);
+            int xC = size / 2;
+            int yC = size / 2;
+
+            int xUpper = 0;
+            for (int x = xC; x >= 0;)
+            {
+                bool interception = false;
+                for (int y = 0; y < size; y++)
+                {
+                    if (img[x, y] != 1)
+                    {
+                        interception = true;
+                        break;
+                    } 
+                }
+                if (interception)
+                {
+                    x--;
+                    continue;
+                }
+                xUpper = x;
+                break;
+            }
+
+            int xLower = size - 1;
+            for (int x = xC; x < size;)
+            {
+                bool interception = false;
+                for (int y = 0; y < size; y++)
+                {
+                    if (img[x, y] != 1)
+                    {
+                        interception = true;
+                        break;
+                    }
+                }
+                if (interception)
+                {
+                    x++;
+                    continue;
+                }
+                xLower = x;
+                break;
+            }
+
+            int yUpper = 0;
+            for (int y = yC; y >= 0;)
+            {
+                bool interception = false;
+                for (int x = 0; x < size; x++)
+                {
+                    if (img[x, y] != 1)
+                    {
+                        interception = true;
+                        break;
+                    }
+                }
+                if (interception)
+                {
+                    y--;
+                    continue;
+                }
+                yUpper = y;
+                break;
+            }
+
+            int yLower = size - 1;
+            for (int y = yC; y < 300;)
+            {
+                bool interception = false;
+                for (int x = 0; x < size; x++)
+                {
+                    if (img[x, y] != 1)
+                    {
+                        interception = true;
+                        break;
+                    }
+                }
+                if (interception)
+                {
+                    y++;
+                    continue;
+                }
+                yLower = y;
+                break;
+            }
+
+            int maxDim = Math.Max(xLower - xUpper, yLower - yUpper);
+            int desiredSize = (int)((maxDim / 11f) * 15);
+
+            float[,] data = new float[desiredSize, desiredSize];
+            for (int x = 0; x < desiredSize; x++)
+            {
+                for (int y = 0; y < desiredSize; y++)
+                {
+                    data[x, y] = img[x + xC - desiredSize / 2, y + yC - desiredSize / 2];
+                }
+            }
+
+            return data;
         }
 
         /// <summary>
