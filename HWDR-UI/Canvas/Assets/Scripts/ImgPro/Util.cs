@@ -61,9 +61,14 @@ namespace ImgPro
             return null;
         }
 
-        public static Texture2D Resize(Texture2D texture, int res)
+        /// <summary>
+        /// Resize the given Texture2D in place to given restitution
+        /// </summary>
+        /// <param name="texture">Texture2D to be resized</param>
+        /// <param name="resolution">New resolution for the texture</param>
+        public static void Resize(Texture2D texture, int resolution)
         {
-            return null;
+            TextureScale.Scale(texture, resolution, resolution);
         }
 
         /// <summary>
