@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.IO;
+using System;
 
 public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
@@ -153,18 +154,29 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         xC = (xC / t) - (size / 2);
         yC = (yC / t) - (size / 2);
 
+        float[,] translatedData = new float[size, size];
+        for (int x = Math.Max(0, (int)xC); x < Math.Min(size, size + (int)xC); x++)
+        {
+            for (int y = Math.Max(0, (int)yC); y < Math.Min(size, size + (int)yC); y++)
+            {
+                translatedData[x - (int)xC, y - (int)yC] = data[x, y];
+            }
+        }
+
         for (int x = 0; x < size; x++)
         {
             for (int y = 0; y < size; y++)
             {
-                data[x, y] = -(data[x, y] - 1);
-                bytes[x * size + y] = new Color(data[x, y], data[x, y], data[x, y]);
+                translatedData[x, y] = -(translatedData[x, y] - 1);
+                bytes[x * size + y] = new Color(translatedData[x, y], translatedData[x, y], translatedData[x, y]);
             }
         }
 
-        File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture.EncodeToPNG());
+        Texture2D texture2d = new Texture2D(size, size, TextureFormat.ARGB32, false);
+        texture2d.SetPixels(bytes);
+        File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture2d.EncodeToPNG());
 
-        Debug.Log($"{xC} {yC} {t}");
+
         
     }
 }
