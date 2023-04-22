@@ -134,49 +134,15 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     {
         File.WriteAllBytes(Application.dataPath + "/" + fileName + "b.png", texture.EncodeToPNG());
 
-        Color[] bytes = texture.GetPixels();
+        float[,] data = ImgPro.Util.TextureToRaw(texture);
+        data = ImgPro.Util.Centre(data);
+        Texture2D texture2d = ImgPro.Util.RawToTexture(data);
 
-        int size = 300;// (int)Mathf.Sqrt(bytes.Length);
-        float[,] data = new float[size, size];
-        float xC = 0;
-        float yC = 0;
-        float t = 0;
-        for (int x = 0; x < size; x++)
-        {
-            for (int y = 0; y < size; y++)
-            {
-                data[x, y] = -(bytes[x * size + y].grayscale - 1);
-                t += data[x, y];
-                xC += x * data[x, y];
-                yC += y * data[x, y];
-            }
-        }
-        xC = (xC / t) - (size / 2);
-        yC = (yC / t) - (size / 2);
-
-        float[,] translatedData = new float[size, size];
-        for (int x = Math.Max(0, (int)xC); x < Math.Min(size, size + (int)xC); x++)
-        {
-            for (int y = Math.Max(0, (int)yC); y < Math.Min(size, size + (int)yC); y++)
-            {
-                translatedData[x - (int)xC, y - (int)yC] = data[x, y];
-            }
-        }
-
-        for (int x = 0; x < size; x++)
-        {
-            for (int y = 0; y < size; y++)
-            {
-                translatedData[x, y] = -(translatedData[x, y] - 1);
-                bytes[x * size + y] = new Color(translatedData[x, y], translatedData[x, y], translatedData[x, y]);
-            }
-        }
-
-        Texture2D texture2d = new Texture2D(size, size, TextureFormat.ARGB32, false);
-        texture2d.SetPixels(bytes);
         File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture2d.EncodeToPNG());
+    }
 
+    void Update()
+    {
 
-        
     }
 }
