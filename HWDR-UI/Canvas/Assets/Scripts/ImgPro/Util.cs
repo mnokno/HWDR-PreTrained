@@ -159,7 +159,16 @@ namespace ImgPro
             {
                 for (int y = 0; y < desiredSize; y++)
                 {
-                    data[x, y] = img[x + xC - desiredSize / 2, y + yC - desiredSize / 2];
+                    int xT = x + xC - desiredSize / 2;
+                    int yT = y + yC - desiredSize / 2;
+                    if (xT < 0 || yT < 0 || xT > size - 1 || yT > size - 1)
+                    {
+                        data[x, y] = 1;
+                    }
+                    else
+                    {
+                        data[x, y] = img[xT, yT];
+                    }
                 }
             }
 
