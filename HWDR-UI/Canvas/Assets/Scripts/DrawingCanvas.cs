@@ -15,10 +15,10 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     {
         rectTransform = GetComponent<RectTransform>();
         image = GetComponent<Image>();
-        ClearCanvas();
+        Setup();
     }
 
-    public void ClearCanvas()
+    public void Setup()
     {
         // Create a new texture to use as the canvas
         texture = new Texture2D((int)rectTransform.rect.width, (int)rectTransform.rect.height, TextureFormat.RGBA32, false);
@@ -32,6 +32,20 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         texture.SetPixels32(pixels);
         texture.Apply();
         image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+    }
+
+    public void Clear()
+    {
+        Color[] pixels = texture.GetPixels();
+        Color clearColor = new Color(1, 1, 1, 1);
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = clearColor;
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
     }
 
     public void OnPointerDown(PointerEventData eventData)
