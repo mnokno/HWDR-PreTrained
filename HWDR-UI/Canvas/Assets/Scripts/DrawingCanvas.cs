@@ -136,13 +136,15 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
 
         float[,] data = ImgPro.Util.TextureToRaw(texture);
         data = ImgPro.Util.Centre(data);
+        data = ImgPro.Util.ResizeDigit(data);
         Texture2D texture2d = ImgPro.Util.RawToTexture(data);
+        ImgPro.Util.Resize(texture2d, 28);
 
         File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture2d.EncodeToPNG());
     }
 
-    void Update()
+    public Texture2D GetTexture()
     {
-
+        return texture;
     }
 }
