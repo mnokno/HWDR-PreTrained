@@ -154,13 +154,15 @@ namespace ImgPro
             int maxDim = Math.Max(xLower - xUpper, yLower - yUpper);
             int desiredSize = (int)((maxDim / 11f) * 15);
 
+            int xDc = (xLower + xUpper) / 2;
+            int yDc = (yLower + yUpper) / 2;
             float[,] data = new float[desiredSize, desiredSize];
             for (int x = 0; x < desiredSize; x++)
             {
                 for (int y = 0; y < desiredSize; y++)
                 {
-                    int xT = x + xC - desiredSize / 2;
-                    int yT = y + yC - desiredSize / 2;
+                    int xT = x + xDc - desiredSize / 2;
+                    int yT = y + yDc - desiredSize / 2;
                     if (xT < 0 || yT < 0 || xT > size - 1 || yT > size - 1)
                     {
                         data[x, y] = 1;
