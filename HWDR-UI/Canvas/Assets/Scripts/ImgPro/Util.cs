@@ -51,13 +51,38 @@ namespace ImgPro
             return translatedData;
         }
 
-        public static float[,] Blure(float[,] img)
+        /// <summary>
+        /// Applies box bluer filter with the center have weight 3
+        /// </summary>
+        /// <param name="img">Image to bluer</param>
+        /// <param name="blureSize">Size of the box</param>
+        /// <returns>New bluer copy of the image</returns>
+        public static float[,] BoxBlure(float[,] img, int blureSize = 3)
         {
-            throw new System.NotImplementedException();
+            int size = (int)Math.Sqrt(img.Length);
+            int padd = blureSize / 2;
+            int filterArea = blureSize * blureSize;
+            float[,] blured = new float[size, size];
+            for (int x = padd; x < size - padd; x++)
+            {
+                for (int y = padd; y < size - padd; y++)
+                {
+                    float total = 0;
+                    for (int xf = -padd; xf < blureSize - padd; xf++)
+                    {
+                        for (int yf = -padd; yf < blureSize - padd; yf++)
+                        {
+                            total += img[x + xf, y + yf];
+                        }
+                    }
+                    blured[x, y] = (total + img[x, y] * 2) / (float)(filterArea + 2);
+                }
+            }
+            return blured;
         }
 
         /// <summary>
-        /// Resizes the image so that digits max dimensions spans 73% of the image restitution
+        /// Resizes the image so that digits max dimensions spans 65% of the image restitution
         /// </summary>
         /// <param name="img">Image data to size</param>
         /// <returns>Sized copy of the original image data</returns>
@@ -152,7 +177,7 @@ namespace ImgPro
             }
 
             int maxDim = Math.Max(xLower - xUpper, yLower - yUpper);
-            int desiredSize = (int)((maxDim / 11f) * 15);
+            int desiredSize = (int)((maxDim / 11f) * 17);
 
             int xDc = (xLower + xUpper) / 2;
             int yDc = (yLower + yUpper) / 2;
