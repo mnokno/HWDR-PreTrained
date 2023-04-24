@@ -9,10 +9,14 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     private RectTransform rectTransform;
     private Image image;
     private Texture2D texture;
+    private Texture2D textureAfterProcessing;
     public int brushSize = 15;
 
     private void Awake()
     {
+        textureAfterProcessing = new Texture2D(28, 28, TextureFormat.RGBA32, false);
+        textureAfterProcessing.filterMode = FilterMode.Point;
+        textureAfterProcessing.wrapMode = TextureWrapMode.Clamp;
         rectTransform = GetComponent<RectTransform>();
         image = GetComponent<Image>();
         Setup();
@@ -82,6 +86,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
                 int endX = Mathf.RoundToInt(localPoint.x + texture.width / 2f);
                 int endY = Mathf.RoundToInt(localPoint.y + texture.height / 2f);
                 DrawLine(startX, startY, endX, endY, Color.black);
+                Processtexture();
             }
         }
     }
@@ -157,8 +162,28 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture2d.EncodeToPNG());
     }
 
+    /// <summary>
+    /// Process the input texture to one that the neural network will take as an input
+    /// </summary>
+    private void Processtexture()
+    {
+        float[,] data = ImgPro.Util.ResizeDigit(ImgPro.Util.Centre(ImgPro.Util.TextureToRaw(texture)));
+        if (data.Length > 0)
+        {
+            Texture2D newTexture = ImgPro.Util.RawToTexture(data);
+            ImgPro.Util.Resize(newTexture, 28);
+            newTexture = ImgPro.Util.RawToTexture(ImgPro.Util.BoxBlure(ImgPro.Util.TextureToRaw(newTexture)));
+            textureAfterProcessing.SetPixels(newTexture.GetPixels());
+            textureAfterProcessing.Apply();
+        }
+    }
+
+    /// <summary>
+    /// Getter for texture after processing
+    /// </summary>
+    /// <returns>Texture2D after processing</returns>
     public Texture2D GetTexture()
     {
-        return texture;
+        return textureAfterProcessing;
     }
 }
