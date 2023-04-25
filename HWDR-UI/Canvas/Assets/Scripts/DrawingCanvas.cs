@@ -172,7 +172,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         {
             Texture2D newTexture = ImgPro.Util.RawToTexture(data);
             ImgPro.Util.Resize(newTexture, 28);
-            newTexture = ImgPro.Util.RawToTexture(ImgPro.Util.BoxBlure(ImgPro.Util.TextureToRaw(newTexture)));
+            //newTexture = ImgPro.Util.RawToTexture(ImgPro.Util.BoxBlure(ImgPro.Util.TextureToRaw(newTexture)));
             textureAfterProcessing.SetPixels(newTexture.GetPixels());
             textureAfterProcessing.Apply();
         }
