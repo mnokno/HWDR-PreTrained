@@ -2,6 +2,9 @@ using System;
 using Unity.Barracuda;
 using UnityEngine;
 
+/// <summary>
+/// Simple classifier that uses a neural network to classify handwritten digits
+/// </summary>
 public class Classifier : MonoBehaviour
 {
 
@@ -23,6 +26,11 @@ public class Classifier : MonoBehaviour
         worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, model);
     }
 
+    /// <summary>
+    /// Predicts the digit in the given texture
+    /// </summary>
+    /// <param name="texture">Texture to predict</param>
+    /// <returns>Array of probabilities for each digit</returns>
     public float[] Predict(Texture2D texture)
     {
         Color[] bytes = texture.GetPixels();
@@ -48,6 +56,11 @@ public class Classifier : MonoBehaviour
         return outputArray;
     }
 
+    /// <summary>
+    /// Applies the softmax function to the given array
+    /// </summary>
+    /// <param name="oNodes">Array to apply softmax to</param>
+    /// <returns>Array with softmax applied</returns>
     private static float[] Softmax(float[] oNodes)
     {
         // softmax(x) = e ^ x / (e ^ x + e ^ y + e ^ z)
