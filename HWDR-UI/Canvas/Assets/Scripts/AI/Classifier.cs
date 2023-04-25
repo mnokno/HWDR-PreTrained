@@ -41,10 +41,11 @@ public class Classifier : MonoBehaviour
         Tensor inputs = new Tensor(1, 28, 28, 1, data);
         worker.Execute(inputs);
         Tensor output = worker.PeekOutput();
-        //Debug.Log(string.Join(" ", output.ToReadOnlyArray()));
-        //Debug.Log(string.Join(" ", Softmax(output.ToReadOnlyArray())));
 
-        return Softmax(output.ToReadOnlyArray());
+        float[] outputArray = Softmax(output.ToReadOnlyArray());
+        inputs.Dispose();
+        output.Dispose();
+        return outputArray;
     }
 
     private static float[] Softmax(float[] oNodes)
