@@ -52,17 +52,20 @@ namespace ImgPro
         }
 
         /// <summary>
-        /// Applies box bluer filter with the center have weight 3
+        /// Applies box bluer filter
         /// </summary>
         /// <param name="img">Image to bluer</param>
-        /// <param name="blureSize">Size of the box</param>
+        /// <param name="blureSize">Size of the box, has to be odd</param>
+        /// <param name="centerWeight">Weight that the center of the filer will have relative to </param>
         /// <returns>New bluer copy of the image</returns>
-        public static float[,] BoxBlure(float[,] img, int blureSize = 3)
+        public static float[,] BoxBlure(float[,] img, int blureSize = 3, int centerWeight = 3)
         {
+            Debug.Assert(blureSize % 2 == 1, $"blureSize has to be odd, {blureSize} was given which is even =!");
             int size = (int)Math.Sqrt(img.Length);
             int padd = blureSize / 2;
             int filterArea = blureSize * blureSize;
             float[,] blured = new float[size, size];
+            centerWeight = centerWeight - 1;
             for (int x = padd; x < size - padd; x++)
             {
                 for (int y = padd; y < size - padd; y++)
@@ -75,7 +78,14 @@ namespace ImgPro
                             total += img[x + xf, y + yf];
                         }
                     }
-                    blured[x, y] = (total + img[x, y] * 2) / (float)(filterArea + 2);
+                    blured[x, y] = (total + img[x, y] * centerWeight) / (float)(filterArea + centerWeight);
+                }
+            }
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    blured[x, y] = -(blured[x, y] - 1);
                 }
             }
             return blured;
