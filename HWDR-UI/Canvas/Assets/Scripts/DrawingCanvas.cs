@@ -85,8 +85,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
                 int startY = Mathf.RoundToInt(previousPoint.y + texture.height / 2f);
                 int endX = Mathf.RoundToInt(localPoint.x + texture.width / 2f);
                 int endY = Mathf.RoundToInt(localPoint.y + texture.height / 2f);
-                DrawLine(startX, startY, endX, endY, Color.black);
-                Processtexture();
+                DrawLine(startX, startY, endX, endY, Color.black);               
             }
         }
     }
@@ -122,6 +121,7 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
 
         texture.Apply();
+        Processtexture();
     }
 
     private void DrawBrush(int x, int y, int size, Color color)
