@@ -28,14 +28,14 @@ public class Classifier : MonoBehaviour
         Color[] bytes = texture.GetPixels();
         int size = (int)Mathf.Sqrt(bytes.Length);
         float[] data = new float[bytes.Length];
+        float[] rotatedData = new float[bytes.Length];
         for (int i = 0; i < bytes.Length; i++)
         {
-            data[i] = -(bytes[i].grayscale - 1);
-            if (data[i] > 1 || data[i] < 0)
-            {
-                Debug.LogError("Invalid input");
-            }
+            int row = i / size;
+            int col = i - row * size;
+            rotatedData[col + (27 - row) * 28] = -(bytes[i].grayscale - 1);
         }
+        data = rotatedData;
 
         Debug.Assert(data.Length == 28 * 28, $"{data.Length} != {28 * 28}");
         Tensor inputs = new Tensor(1, 28, 28, 1, data);
