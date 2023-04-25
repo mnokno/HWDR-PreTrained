@@ -2,16 +2,36 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.IO;
-using System;
 
+/// <summary>
+/// Simple drawing canvas with automatic image processing for handwrite digit classification model
+/// </summary>
 public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
+    /// <summary>
+    /// The rect transform of the canvas
+    /// </summary>
     private RectTransform rectTransform;
+    /// <summary>
+    /// The image component of the canvas
+    /// </summary>
     private Image image;
+    /// <summary>
+    /// The texture of the canvas
+    /// </summary>
     private Texture2D texture;
+    /// <summary>
+    /// The texture of the canvas after processing
+    /// </summary>
     private Texture2D textureAfterProcessing;
+    /// <summary>
+    /// The brush size
+    /// </summary>
     public int brushSize = 15;
 
+    /// <summary>
+    /// Called before Start
+    /// </summary>
     private void Awake()
     {
         textureAfterProcessing = new Texture2D(28, 28, TextureFormat.RGBA32, false);
@@ -22,7 +42,10 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         Setup();
     }
 
-    public void Setup()
+    /// <summary>
+    /// Sets up the canvas
+    /// </summary>
+    private void Setup()
     {
         // Create a new texture to use as the canvas
         texture = new Texture2D((int)rectTransform.rect.width, (int)rectTransform.rect.height, TextureFormat.RGBA32, false);
@@ -38,20 +61,35 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 
+    /// <summary>
+    /// Clears the canvas
+    /// </summary>
     public void Clear()
     {
-        Color[] pixels = texture.GetPixels();
+        Color[] pixels;
         Color clearColor = new Color(1, 1, 1, 1);
 
+        pixels = texture.GetPixels();
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = clearColor;
         }
-
         texture.SetPixels(pixels);
         texture.Apply();
+
+        pixels = textureAfterProcessing.GetPixels();
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = clearColor;
+        }
+        textureAfterProcessing.SetPixels(pixels);
+        textureAfterProcessing.Apply();
     }
 
+    /// <summary>
+    /// Handles on mouse dawn
+    /// </summary>
+    /// <param name="eventData">Event data</param>
     public void OnPointerDown(PointerEventData eventData)
     {
         // Get the position of the user's pointer on the canvas
@@ -71,6 +109,10 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
     }
 
+    /// <summary>
+    /// Handles on drag event
+    /// </summary>
+    /// <param name="eventData">Event data</param>
     public void OnDrag(PointerEventData eventData)
     {
         // Get the position of the user's pointer on the canvas
@@ -90,6 +132,14 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         }
     }
 
+    /// <summary>
+    /// Draws a line using a brush
+    /// </summary>
+    /// <param name="x0">X coordinate of starting position</param>
+    /// <param name="y0">Y coordinate of starting position</param>
+    /// <param name="x1">X coordinate of end position</param>
+    /// <param name="y1">Y coordinate of end position</param>
+    /// <param name="color">Color for the line</param>
     private void DrawLine(int x0, int y0, int x1, int y1, Color color)
     {
         int dx = Mathf.Abs(x1 - x0);
@@ -124,6 +174,13 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         Processtexture();
     }
 
+    /// <summary>
+    /// Draws a brush, instead of a single pixel
+    /// </summary>
+    /// <param name="x">X of the brush center</param>
+    /// <param name="y">Y of the brush center</param>
+    /// <param name="size">Size of the brush</param>
+    /// <param name="color">Color of the brush</param>
     private void DrawBrush(int x, int y, int size, Color color)
     {
         int radius = size / 2;
@@ -149,17 +206,14 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         texture.Apply();
     }
 
+    /// <summary>
+    /// Saves preprocessed and process image data (mostly for debugging purposes)
+    /// </summary>
+    /// <param name="fileName"></param>
     public void SaveCanvas(string fileName)
     {
         File.WriteAllBytes(Application.dataPath + "/" + fileName + "b.png", texture.EncodeToPNG());
-
-        float[,] data = ImgPro.Util.TextureToRaw(texture);
-        data = ImgPro.Util.Centre(data);
-        data = ImgPro.Util.ResizeDigit(data);
-        Texture2D texture2d = ImgPro.Util.RawToTexture(data);
-        ImgPro.Util.Resize(texture2d, 28);
-
-        File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", texture2d.EncodeToPNG());
+        File.WriteAllBytes(Application.dataPath + "/" + fileName + "a.png", textureAfterProcessing.EncodeToPNG());
     }
 
     /// <summary>
