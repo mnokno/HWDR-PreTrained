@@ -221,7 +221,12 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     /// </summary>
     private void Processtexture()
     {
-        float[,] data = ImgPro.Util.ResizeDigit(ImgPro.Util.Centre(ImgPro.Util.TextureToRaw(texture)));
+        float[,] data = 
+            ImgPro.Util.ResizeDigit(
+                ImgPro.Util.ReversPolarity(
+                    ImgPro.Util.Centre(
+                        ImgPro.Util.ReversPolarity(
+                            ImgPro.Util.TextureToRaw(texture)))));
         if (data.Length > 0)
         {
             Texture2D newTexture = ImgPro.Util.RawToTexture(data);

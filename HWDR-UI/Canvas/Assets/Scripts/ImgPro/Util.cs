@@ -40,14 +40,6 @@ namespace ImgPro
                 }
             }
 
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    translatedData[x, y] = -(translatedData[x, y] - 1);
-                }
-            }
-
             return translatedData;
         }
 
@@ -79,13 +71,6 @@ namespace ImgPro
                         }
                     }
                     blured[x, y] = (total + img[x, y] * centerWeight) / (float)(filterArea + centerWeight);
-                }
-            }
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    blured[x, y] = -(blured[x, y] - 1);
                 }
             }
             return blured;
@@ -237,7 +222,7 @@ namespace ImgPro
             {
                 for (int y = 0; y < size; y++)
                 {
-                    data[x, y] = -(bytes[x * size + y].grayscale - 1);
+                    data[x, y] = bytes[x * size + y].grayscale;
                 }
             }
 
@@ -265,6 +250,24 @@ namespace ImgPro
             Texture2D texture = new Texture2D(size, size, TextureFormat.ARGB32, false);
             texture.SetPixels(data);
             return texture;
+        }
+
+        /// <summary>
+        /// Inverts the polarity of the given image in place
+        /// </summary>
+        /// <param name="img">Raw image data</param>
+        /// <returns>Raw image data with inverted polarity</returns>
+        public static float[,] ReversPolarity(float[,] img)
+        {
+            int size = (int)Math.Sqrt(img.Length);
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    img[x, y] = -(img[x, y] - 1);
+                }
+            }
+            return img;
         }
     }
 }
