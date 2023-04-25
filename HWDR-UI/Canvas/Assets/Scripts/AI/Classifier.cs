@@ -1,26 +1,26 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
 
 public class Classifier : MonoBehaviour
 {
 
+    /// <summary>
+    /// Model used to make predictions
+    /// </summary>
     [SerializeField] private NNModel classifier;
+    /// <summary>
+    /// Worker used to run the model
+    /// </summary>
     private IWorker worker;
 
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// Start is called before the first frame update
+    /// </summary>
+    private void Start()
     {
         Model model = ModelLoader.Load(classifier);
         worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, model);
-        float[] data = new float[28 * 28];
-        Tensor inputs = new Tensor(1, 28, 28, 1, data);
-        worker.Execute(inputs);
-        Tensor output = worker.PeekOutput();
-        Debug.Log(string.Join(" ", output.ToReadOnlyArray()));
-        Debug.Log(string.Join(" ", Softmax(output.ToReadOnlyArray())));
     }
 
     public float[] Predict(Texture2D texture)
@@ -31,10 +31,12 @@ public class Classifier : MonoBehaviour
         for (int i = 0; i < bytes.Length; i++)
         {
             data[i] = -(bytes[i].grayscale - 1);
+            if (data[i] > 1 || data[i] < 0)
+            {
+                Debug.LogError("Invalid input");
+            }
         }
 
-        Model model = ModelLoader.Load(classifier);
-        worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, model);
         Debug.Assert(data.Length == 28 * 28, $"{data.Length} != {28 * 28}");
         Tensor inputs = new Tensor(1, 28, 28, 1, data);
         worker.Execute(inputs);
@@ -43,12 +45,6 @@ public class Classifier : MonoBehaviour
         //Debug.Log(string.Join(" ", Softmax(output.ToReadOnlyArray())));
 
         return Softmax(output.ToReadOnlyArray());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private static float[] Softmax(float[] oNodes)
