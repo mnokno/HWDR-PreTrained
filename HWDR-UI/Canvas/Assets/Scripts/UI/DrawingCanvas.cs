@@ -51,14 +51,22 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
         texture = new Texture2D((int)rectTransform.rect.width, (int)rectTransform.rect.height, TextureFormat.RGBA32, false);
         texture.filterMode = FilterMode.Point;
         texture.wrapMode = TextureWrapMode.Clamp;
-        Color32[] pixels = new Color32[texture.width * texture.height];
+        Color[] pixels = new Color[texture.width * texture.height];
         for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = Color.white;
         }
-        texture.SetPixels32(pixels);
+        texture.SetPixels(pixels);
         texture.Apply();
         image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+        pixels = textureAfterProcessing.GetPixels();
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = Color.white;
+        }
+        textureAfterProcessing.SetPixels(pixels);
+        textureAfterProcessing.Apply();
     }
 
     /// <summary>
@@ -244,5 +252,14 @@ public class DrawingCanvas : MonoBehaviour, IPointerDownHandler, IDragHandler
     public Texture2D GetTexture()
     {
         return textureAfterProcessing;
+    }
+
+    
+    /// <summary>
+    /// Quites the application
+    /// </summary>
+    public void Quit()
+    {
+        Application.Quit();
     }
 }

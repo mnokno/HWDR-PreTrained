@@ -91,4 +91,12 @@ public class Classifier : MonoBehaviour
         // Returns the product
         return product;
     }
+
+    /// <summary>
+    /// Called when the application quits
+    /// </summary>
+    private void OnApplicationQuit()
+    {
+        worker?.Dispose();
+    }
 }
