@@ -15,9 +15,13 @@ public class ClassificationDisplay : MonoBehaviour
     /// </summary>
     private Texture2D texture;
     /// <summary>
+    /// Probabilities display
+    /// </summary>
+    [SerializeField] private Text textProbabilities;
+    /// <summary>
     /// Prediction display
     /// </summary>
-    [SerializeField] private Text text;
+    [SerializeField] private Text textPrediction;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +34,7 @@ public class ClassificationDisplay : MonoBehaviour
     void Update()
     {
         float[] preds = classifier.Predict(texture);
-        
+         
         float max = -1;
         int best = -1;
         for (int i = 0; i < 10; i++)
@@ -41,6 +45,13 @@ public class ClassificationDisplay : MonoBehaviour
                 best = i;
             }
         }
-        text.text = best.ToString();
+        textPrediction.text = best.ToString();
+
+        string proba = "";
+        for (int i = 0; i < 10; i++)
+        {
+            proba += $"{i}: " + (preds[i]  * 100).ToString("0.00") + "%\n";
+        }
+        textProbabilities.text = proba;
     }
 }
